@@ -21,11 +21,9 @@ class MainWindow(QMainWindow):
         canvas.fill(Qt.white)
         self.label.setPixmap(canvas)
 
-
         self.setCentralWidget(self.label)
 
         self.setAttribute(Qt.WA_AcceptTouchEvents, False)
-
 
         self.pen_size = 8
         self.eraser_mode = False
@@ -60,7 +58,6 @@ class MainWindow(QMainWindow):
             self.last_point = None
 
         event.accept()
-
 
     def _draw_line(self, from_point, to_point):
         pixmap = self.label.pixmap()
