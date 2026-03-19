@@ -16,11 +16,26 @@ class MainWindow(QMainWindow):
 
         self.label = QtWidgets.QLabel()
         canvas = QtGui.QPixmap(640,480)
+        self.resize(640,480)
+        self.label.setScaledContents(True)
         canvas.fill(Qt.white)
         self.label.setPixmap(canvas)
+
+
         self.setCentralWidget(self.label)
 
         self.setAttribute(Qt.WA_AcceptTouchEvents, False)
+
+
+    def resizeEvent(self, event):
+        old_pixmap = self.label.pixmap()
+        scaled = old_pixmap.scaled(
+            self.label.size(),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        )
+        self.label.setPixmap(scaled)
+        super().resizeEvent(event)
 
     def tabletEvent(self, event):
         event_type = event.type()
@@ -60,56 +75,6 @@ class MainWindow(QMainWindow):
             painter.drawLine(from_point, to_point)
         self.label.setPixmap(pixmap)
         self.update()
-        
-    # def mouseMoveEvent(self,event):
-    #     if self.last_point is None:
-    #         self.last_point = event.position()
-    #         return
-        
-    #     with QPainter(self.label.pixmap()) as painter:
-    #         pen = painter.pen()
-    #         painter.setPen(pen)
-    #         self._draw_line(self.last_point, event.position())
-            
-    #     self.update()
-
-    #     self.last_point = event.position()
-
-    # def mouseReleaseEvent(self, event):
-    #     self.last_point = None
-
-    # def drawpoint(self):
-    #     with QPainter(self.label.pixmap()) as painter:
-    #         painter.drawPoint(200,150)
-            
-    # def drawSquare(self):
-    #     with QPainter(self.label.pixmap()) as painter:
-    #         pen = QtGui.QPen()
-    #         pen.setWidth(40)
-    #         pen.setColor(QtGui.QColor('red'))
-    #         painter.setPen(pen)
-    #         painter.drawPoint(200,150)
-            
-    # def drawRandom(self):
-    #     from random import randint, choice
-    #     colors = ['#FFD141', '#376F9F', '#0D1F2D', '#E9EBEF', '#EB5160']
-
-    #     with QPainter(self.label.pixmap()) as painter: #required to open drawing process
-        
-    #         pen = QtGui.QPen() # required to give painter unique attributes (size, color, etc)
-    #         pen.setWidth(3)
-            
-    #         painter.setPen(pen) # required for dynaimc updating of pen characteristics
-
-    #         for n in range(10000):
-    #             pen.setColor(QtGui.QColor(choice(colors)))
-    #             painter.setPen(pen) # update pen
-    #             painter.drawPoint(
-    #                 200+randint(-100,100),
-    #                 150+randint(-100,100)
-    #             )
-    #         #required to end drawing operation like SQL
-
 
 app=QtWidgets.QApplication(sys.argv)
 window=MainWindow()
