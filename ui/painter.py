@@ -27,6 +27,12 @@ class MainWindow(QMainWindow):
         self.setAttribute(Qt.WA_AcceptTouchEvents, False)
 
 
+        self.pen_size = 8
+        self.eraser_mode = False
+
+    def toggle_eraser(self):
+        self.eraser_mode = not self.eraser_mode #implement button toggle for eraser maybe idk
+
     def resizeEvent(self, event):
         old_pixmap = self.label.pixmap()
         scaled = old_pixmap.scaled(
@@ -39,13 +45,6 @@ class MainWindow(QMainWindow):
 
     def tabletEvent(self, event):
         event_type = event.type()
-
-        print(f"{event_type}")
-
-        print(f"{QEvent.Type.TabletPress}")
-        print(f"{QEvent.Type.TabletMove}")
-        print(f"{QEvent.Type.TabletRelease}")
-
 
         if(event_type == QEvent.Type.TabletPress):
             self.is_drawing = True
@@ -67,14 +66,26 @@ class MainWindow(QMainWindow):
         pixmap = self.label.pixmap()
         with QPainter(pixmap) as painter:
             pen = QPen()
-            pen.setWidth(max(1,int(8*self.pen_pressure)))
-            pen.setColor(QColor('black'))
+            if self.eraser_mode:
+                pen.setWidth(max(1,int(self.pen_size*self.pen_pressure)))
+                pen.setColor(QColor('white'))
+            else:
+                pen.setWidth(max(1,int(self.pen_size*self.pen_pressure)))
+                pen.setColor(QColor('black'))
+
             pen.setCapStyle(Qt.RoundCap)
-            pen.setJoinStyle(Qt.RoundJoin)
+            pen.setJoinStyle(Qt.RoundJoin)    
             painter.setPen(pen)
             painter.drawLine(from_point, to_point)
         self.label.setPixmap(pixmap)
         self.update()
+    
+    def keyPressEvent(self, event):
+        key = event.key()
+
+        if(key == Qt.Key_E):
+            self.toggle_eraser()
+        
 
 app=QtWidgets.QApplication(sys.argv)
 window=MainWindow()
