@@ -1,10 +1,15 @@
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt
-
-import os, time, sys, subprocess
+from PySide6.QtCore import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import QMainWindow
+from PySide6.QtSvg import * 
+
+from PySide6.QtSvgWidgets import QSvgWidget
+
+import os, time, sys, subprocess, random
+
+kanjipath = "./kanji"
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -13,6 +18,7 @@ class MainWindow(QMainWindow):
         self.pen_pressure = 1
         self.last_point = None
         self.is_drawing = False
+
 
         self.label = QtWidgets.QLabel()
         canvas = QtGui.QPixmap(640,480)
@@ -82,7 +88,38 @@ class MainWindow(QMainWindow):
 
         if(key == Qt.Key_E):
             self.toggle_eraser()
+        elif(key == Qt.Key_R):
+            path = self.select_random()
+            self.load_svg(path)
+
+            print(f"{path}")
+            print("made it through")
+
+            
+        super().keyPressEvent(event)
+    
+    def select_random(self):
+        entries = os.listdir(kanjipath)
+
+        files = [f for f in entries if os.path.isfile(os.path.join(kanjipath, f))]
+
+        if not files:
+            return "COULDN'T LOCATE KANJI SVGs"
+
+        random_filename = random.choice(files)
+
+        return os.path.join(kanjipath, random_filename)
+
+    def load_svg(self,path):
+        renderer = QSvgRenderer(path)
         
+        pixmap = QPixmap(self.label.size())
+        pixmap.fill(Qt.white)
+        with QPainter(pixmap) as painter:
+            renderer.render(painter)
+        self.label.setPixmap(pixmap)
+        self.label.update()
+
 
 app=QtWidgets.QApplication(sys.argv)
 window=MainWindow()
