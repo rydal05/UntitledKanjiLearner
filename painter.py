@@ -9,6 +9,8 @@ from PySide6.QtSvgWidgets import QSvgWidget
 
 import os, time, sys, subprocess, random
 
+from core.kanjivg_source import KanjiVGRepository, KanjiVGSourceError
+
 kanjipath = "./kanji"
 
 class MainWindow(QMainWindow):
@@ -122,6 +124,13 @@ class MainWindow(QMainWindow):
 
 
 app=QtWidgets.QApplication(sys.argv)
+
+try:
+    kanjipath = str(KanjiVGRepository().ensure_ready("main"))
+except KanjiVGSourceError as exc:
+    # Keep local development behavior if network or API access fails.
+    print(f"KanjiVG cache setup failed, using local path {kanjipath}: {exc}")
+
 window=MainWindow()
 window.show()
 app.exec()
